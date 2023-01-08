@@ -1,0 +1,73 @@
+### test
+GET localhost:8080/api/hello
+Accept: application/json
+
+### login api 테스트, admin으로 로그인
+###
+# curl --location --request POST 'http://localhost:8080/api/authenticate'
+#--header 'Content-Type: application/json'
+#--data-raw '{
+#    "username": "admin",
+#    "password": "admin"
+#}'
+POST http://localhost:8080/api/authenticate
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin"
+}
+
+### login api 테스트, user로 로그인
+POST http://localhost:8080/api/authenticate
+Content-Type: application/json
+
+{
+  "username": "user",
+  "password": "user"
+}
+
+### signup api 테스트
+POST localhost:8080/api/signup
+Accept: application/json
+Content-Type: application/json
+
+{
+  "username": "jean202",
+  "password": "iconloop12!@",
+  "nickname": "jeanjean"
+
+}
+
+### login api, jean202로 로그인
+POST http://localhost:8080/api/authenticate
+Content-Type: application/json
+
+{
+  "username": "jean202",
+  "password": "iconloop12!@"
+}
+
+### ADMIN 역할(ROLE_ADMIN)인 권한만 호출할 수 있는 api - getUserInfo
+# admin 계정의 토큰(admin, admin으로 /api/authenticate한 결과)을 가지고 jean202계정의 정보를 가져올 수 있었다
+GET localhost:8080/api/user/jean202
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImF1dGgiOiJST0xFX0FETUlOLFJPTEVfVVNFUiIsImV4cCI6MTY3MzI0NTM0NX0.P_4RMDEApixLedGI6LUXESKQvrAIalavck7Gmdr0ZAgnGW9sG8Yo_xlOO-4riO2I0p0UU7ZNl4DeejM4YnK2BA
+Accept: application/json
+
+### ADMIN 역할(ROLE_ADMIN)인 권한만 호출할 수 있는 api - getUserInfo
+# jean202 계정의 토큰을 가지고 접근(admin계정이나 user계정 호출) : Access Denied, 403 -> JwtAccessDeniedHandler가 작동
+GET localhost:8080/api/user/user
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJqZWFuMjAyIiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTY3MzI1MjczMH0.IWTwdou_KzYPfv36orO1hofp5fa9uSg41C3Eu9ANgOyxJ-3gRMR3YEYOQSW9PwrpJOqMVA5MPggybWeN5CwN5g
+Accept: application/json
+
+### USER 역할(ROLE_USER)인 권한도 호출할 수 있는 api - getMyUserInfo : hasAnyRole('USER','ADMIN')
+# 토큰 주인인 자기 자신 계정의 정보(dto 객체)를 반환해 준다
+GET localhost:8080/api/user
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJqZWFuMjAyIiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTY3MzI1MjczMH0.IWTwdou_KzYPfv36orO1hofp5fa9uSg41C3Eu9ANgOyxJ-3gRMR3YEYOQSW9PwrpJOqMVA5MPggybWeN5CwN5g
+Accept: application/json
+
+### admin 계정으로(ROLE_USER and ROLE_ADMIN) getMyUserInfo : hasAnyRole('USER','ADMIN') 호출
+# 토큰 주인인 자기 자신 계정의 정보(dto 객체)를 반환해 준다
+GET localhost:8080/api/user
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImF1dGgiOiJST0xFX0FETUlOLFJPTEVfVVNFUiIsImV4cCI6MTY3MzI0NTM0NX0.P_4RMDEApixLedGI6LUXESKQvrAIalavck7Gmdr0ZAgnGW9sG8Yo_xlOO-4riO2I0p0UU7ZNl4DeejM4YnK2BA
+Accept: application/json
